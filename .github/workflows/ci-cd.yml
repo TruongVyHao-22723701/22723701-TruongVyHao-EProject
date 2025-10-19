@@ -51,6 +51,9 @@ jobs:
       # Khởi động Auth service — KHÔNG cần endpoint /health
       - name: Start Auth service
         working-directory: ./auth
+        env:
+          MONGODB_URI: mongodb://root:password@localhost:27017/auth_db?authSource=admin
+          JWT_SECRET: test_secret_key
         run: |
           echo "🚀 Starting Auth Service on port 3000..."
           nohup npm start > auth.log 2>&1 &
@@ -69,6 +72,7 @@ jobs:
             cat auth.log
             exit 1
           fi
+
 
 
       # Chạy test Product
