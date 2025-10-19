@@ -49,13 +49,26 @@ jobs:
         run: npm install
 
       # Chạy test (có thể chỉ cần product hoặc auth)
+      - name: Start auth service
+        working-directory: ./auth
+        run: |
+          nohup npm start > auth.log 2>&1 &
+          echo "Starting Auth Service on port 3000..."
+          for i in {1..30}; do
+            if nc -z localhost 3000; then
+              echo "Auth service is ready ✅"
+              break
+            fi
+            sleep 2
+          done
+
       - name: Run product tests
         working-directory: ./product
-        run: npm test
         env:
           MONGODB_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
           RABBITMQ_URL: amqp://localhost:5672
           JWT_SECRET: test_secret_key
+        run: npm test
 
   # 🐳 Job 2: BUILD & PUSH DOCKER
   build-and-push:
