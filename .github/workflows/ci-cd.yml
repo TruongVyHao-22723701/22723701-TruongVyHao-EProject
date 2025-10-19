@@ -49,7 +49,7 @@ jobs:
         run: npm install
 
       # Khởi động Auth service — KHÔNG cần endpoint /health
-      - - name: Start Auth service
+      - name: Start Auth service
           working-directory: ./auth
           run: |
             echo "🚀 Starting Auth Service on port 3000..."
