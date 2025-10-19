@@ -48,11 +48,12 @@ jobs:
         working-directory: ./order
         run: npm install
 
-      # Start Auth service with correct env
+      # Start Auth service
       - name: Start Auth service
         working-directory: ./auth
         env:
-          MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/auth_db?authSource=admin
+          PORT: 3000
+          MONGODB_AUTH_URI: mongodb://root:password@mongodb:27017/authDB?authSource=admin
           JWT_SECRET: secretkey123
         run: |
           echo "🚀 Starting Auth Service..."
@@ -60,11 +61,12 @@ jobs:
           echo "⏳ Waiting for Auth service to listen on port 3000..."
           SUCCESS=false
           for i in {1..30}; do
-            if nc -z localhost 3000; then
+            if nc -z 127.0.0.1 3000; then
               echo "✅ Auth service is ready"
               SUCCESS=true
               break
             fi
+            echo "⏳ Waiting... ($i/30)"
             sleep 2
           done
           if [ "$SUCCESS" = false ]; then
@@ -77,11 +79,13 @@ jobs:
       - name: Run Product tests
         working-directory: ./product
         env:
-          MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
+          PORT: 3001
+          MONGODB_AUTH_URI: mongodb://root:password@mongodb:27017/authDB?authSource=admin
+          MONGODB_PRODUCT_URI: mongodb://root:password@mongodb:27017/productDB?authSource=admin
           RABBITMQ_URL: amqp://localhost:5672
           JWT_SECRET: secretkey123
-          LOGIN_TEST_USER: productuser
-          LOGIN_TEST_PASSWORD: password123
+          LOGIN_TEST_USER: TruongVyHao
+          LOGIN_TEST_PASSWORD: 12345
         run: npm test
 
   # 🐳 Job 2: BUILD & PUSH DOCKER
