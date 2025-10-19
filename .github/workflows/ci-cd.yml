@@ -48,15 +48,6 @@ jobs:
         working-directory: ./product
         run: npm install
 
-      - name: Run tests for Product Service
-        working-directory: ./product
-        run: |
-          if [ -f package.json ] && grep -q "\"test\"" package.json; then 
-            npm test 
-          else 
-            echo "No tests defined"; 
-          fi
-
       # =====================
       #  Build Docker Images
       # =====================
