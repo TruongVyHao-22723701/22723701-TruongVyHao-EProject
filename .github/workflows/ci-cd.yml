@@ -48,21 +48,23 @@ jobs:
         working-directory: ./order
         run: npm install
 
-      # Chạy test (có thể chỉ cần product hoặc auth)
-      - name: Start auth service
+      # Khởi động Auth service — KHÔNG cần endpoint /health
+      - name: Start Auth service
         working-directory: ./auth
         run: |
+          echo "🚀 Starting Auth Service on port 3000..."
           nohup npm start > auth.log 2>&1 &
-          echo "Starting Auth Service on port 3000..."
           for i in {1..30}; do
             if nc -z localhost 3000; then
-              echo "Auth service is ready ✅"
+              echo "✅ Auth service is ready"
               break
             fi
+            echo "⏳ Waiting for Auth service to start..."
             sleep 2
           done
 
-      - name: Run product tests
+      # Chạy test Product
+      - name: Run Product tests
         working-directory: ./product
         env:
           MONGODB_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
@@ -70,11 +72,12 @@ jobs:
           JWT_SECRET: test_secret_key
         run: npm test
 
+
   # 🐳 Job 2: BUILD & PUSH DOCKER
   build-and-push:
     name: 🐳 Build and Push Docker Images
     runs-on: ubuntu-latest
-    needs: test   # chỉ chạy sau khi test xong
+    needs: test
 
     strategy:
       matrix:
@@ -103,6 +106,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/eproject-${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/eproject-${{ matrix.service }}:latest
           cache-to: type=inline
+
 
   # 📢 Job 3: NOTIFY
   notify:
