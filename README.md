@@ -33,9 +33,9 @@ Hệ thống thương mại điện tử được xây dựng theo **Microservic
 
 ```
         ┌─────────────┐
-        │   Client    │ (Browser / Postman)
+        │   Client    │ (Postman)
         └──────┬──────┘
-               │ HTTP/REST
+               │ 
                ▼
         ┌──────────────┐
         │ API Gateway  │ Port 3003
@@ -390,8 +390,11 @@ EProject-Phase-1/
 ### 👨‍💻 Tác Giả
 
 **Tên:** Trương Vỹ Hào
+
 **MSSV:** 22723701
+
 **GitHub:** https://github.com/TruongVyHao-22723701/22723701-TruongVyHao-EProject  
+
 **Docker Hub:** https://hub.docker.com/u/truongvyhao
 
 
