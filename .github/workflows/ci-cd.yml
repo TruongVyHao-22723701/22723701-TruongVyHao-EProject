@@ -7,6 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
+  # 🧪 Job 1: TEST
   test:
     name: 🧪 Run Tests
     runs-on: ubuntu-latest
@@ -15,11 +16,10 @@ jobs:
       mongodb:
         image: mongo:latest
         ports:
-          - 27017:27017
+          - 27018:27017  # ⚠️ MongoDB container → map ra ngoài cổng 27018
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: password
-
       rabbitmq:
         image: rabbitmq:3-management
         ports:
@@ -35,6 +35,7 @@ jobs:
         with:
           node-version: 18
 
+      # Install dependencies for all services
       - name: Install dependencies (auth)
         working-directory: ./auth
         run: npm install
@@ -47,11 +48,12 @@ jobs:
         working-directory: ./order
         run: npm install
 
+      # Start Auth service
       - name: Start Auth service
         working-directory: ./auth
         env:
           PORT: 3000
-          MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/authDB?authSource=admin
+          MONGODB_AUTH_URI: mongodb://root:password@localhost:27018/authDB?authSource=admin
           JWT_SECRET: secretkey123
         run: |
           echo "🚀 Starting Auth Service..."
@@ -73,12 +75,21 @@ jobs:
             exit 1
           fi
 
+      # Register a test user
+      - name: Register test user in Auth service
+        run: |
+          echo "🧩 Registering test user..."
+          curl -X POST http://localhost:3000/register \
+            -H "Content-Type: application/json" \
+            -d '{"username": "TruongVyHao", "password": "12345"}' || true
+
+      # Run Product tests
       - name: Run Product tests
         working-directory: ./product
         env:
           PORT: 3001
-          MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/authDB?authSource=admin
-          MONGODB_PRODUCT_URI: mongodb://root:password@localhost:27017/productDB?authSource=admin
+          MONGODB_AUTH_URI: mongodb://root:password@localhost:27018/authDB?authSource=admin
+          MONGODB_PRODUCT_URI: mongodb://root:password@localhost:27018/productDB?authSource=admin
           RABBITMQ_URL: amqp://localhost:5672
           JWT_SECRET: secretkey123
           LOGIN_TEST_USER: TruongVyHao
