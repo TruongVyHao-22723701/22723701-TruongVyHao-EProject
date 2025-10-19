@@ -53,7 +53,7 @@ jobs:
         working-directory: ./auth
         env:
           MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/auth_db?authSource=admin
-          JWT_SECRET: test_secret_key
+          JWT_SECRET: secretkey123
         run: |
           echo "🚀 Starting Auth Service..."
           nohup npm start > auth.log 2>&1 &
@@ -79,7 +79,7 @@ jobs:
         env:
           MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
           RABBITMQ_URL: amqp://localhost:5672
-          JWT_SECRET: test_secret_key
+          JWT_SECRET: secretkey123
           LOGIN_TEST_USER: productuser
           LOGIN_TEST_PASSWORD: password123
         run: npm test
