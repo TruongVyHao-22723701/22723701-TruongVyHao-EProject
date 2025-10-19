@@ -50,25 +50,26 @@ jobs:
 
       # Khởi động Auth service — KHÔNG cần endpoint /health
       - name: Start Auth service
-          working-directory: ./auth
-          run: |
-            echo "🚀 Starting Auth Service on port 3000..."
-            nohup npm start > auth.log 2>&1 &
-            SUCCESS=false
-            for i in {1..30}; do
-              if nc -z 127.0.0.1 3000; then
-                echo "✅ Auth service is ready"
-                SUCCESS=true
-                break
-              fi
-              echo "⏳ Waiting for Auth service to start... ($i/30)"
-              sleep 2
-            done
-            if [ "$SUCCESS" = false ]; then
-              echo "❌ Auth service failed to start in time!"
-              cat auth.log
-              exit 1
+        working-directory: ./auth
+        run: |
+          echo "🚀 Starting Auth Service on port 3000..."
+          nohup npm start > auth.log 2>&1 &
+          SUCCESS=false
+          for i in {1..30}; do
+            if nc -z 127.0.0.1 3000; then
+              echo "✅ Auth service is ready"
+              SUCCESS=true
+              break
             fi
+            echo "⏳ Waiting for Auth service to start... ($i/30)"
+            sleep 2
+          done
+          if [ "$SUCCESS" = false ]; then
+            echo "❌ Auth service failed to start in time!"
+            cat auth.log
+            exit 1
+          fi
+
 
       # Chạy test Product
       - name: Run Product tests
