@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 18
 
-      # Cài dependencies cho từng service
+      # Install dependencies for all services
       - name: Install dependencies (auth)
         working-directory: ./auth
         run: npm install
@@ -48,23 +48,23 @@ jobs:
         working-directory: ./order
         run: npm install
 
-      # Khởi động Auth service — KHÔNG cần endpoint /health
+      # Start Auth service with correct env
       - name: Start Auth service
         working-directory: ./auth
         env:
           MONGODB_URI: mongodb://root:password@localhost:27017/auth_db?authSource=admin
           JWT_SECRET: test_secret_key
         run: |
-          echo "🚀 Starting Auth Service on port 3000..."
+          echo "🚀 Starting Auth Service..."
           nohup npm start > auth.log 2>&1 &
+          echo "⏳ Waiting for Auth service to listen on port 3000..."
           SUCCESS=false
           for i in {1..30}; do
-            if nc -z 127.0.0.1 3000; then
+            if nc -z localhost 3000; then
               echo "✅ Auth service is ready"
               SUCCESS=true
               break
             fi
-            echo "⏳ Waiting for Auth service to start... ($i/30)"
             sleep 2
           done
           if [ "$SUCCESS" = false ]; then
@@ -73,17 +73,16 @@ jobs:
             exit 1
           fi
 
-
-
-      # Chạy test Product
+      # Run Product tests
       - name: Run Product tests
         working-directory: ./product
         env:
           MONGODB_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
           RABBITMQ_URL: amqp://localhost:5672
           JWT_SECRET: test_secret_key
+          LOGIN_TEST_USER: productuser
+          LOGIN_TEST_PASSWORD: password123
         run: npm test
-
 
   # 🐳 Job 2: BUILD & PUSH DOCKER
   build-and-push:
@@ -118,7 +117,6 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/eproject-${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/eproject-${{ matrix.service }}:latest
           cache-to: type=inline
-
 
   # 📢 Job 3: NOTIFY
   notify:
