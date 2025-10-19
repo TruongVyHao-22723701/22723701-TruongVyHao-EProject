@@ -52,7 +52,7 @@ jobs:
       - name: Start Auth service
         working-directory: ./auth
         env:
-          MONGODB_URI: mongodb://root:password@localhost:27017/auth_db?authSource=admin
+          MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/auth_db?authSource=admin
           JWT_SECRET: test_secret_key
         run: |
           echo "🚀 Starting Auth Service..."
@@ -77,7 +77,7 @@ jobs:
       - name: Run Product tests
         working-directory: ./product
         env:
-          MONGODB_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
+          MONGODB_AUTH_URI: mongodb://root:password@localhost:27017/test_db?authSource=admin
           RABBITMQ_URL: amqp://localhost:5672
           JWT_SECRET: test_secret_key
           LOGIN_TEST_USER: productuser
