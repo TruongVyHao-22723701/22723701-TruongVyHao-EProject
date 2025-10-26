@@ -28,8 +28,16 @@ class ProductController {
       }
 
       await product.save({ timeout: 30000 });
+      // 🔽 Thêm log này để hiển thị trong Docker logs
+      console.log("📦 [ProductService] New product created:", {
+        id: product._id.toString(),
+        name: product.name,
+        price: product.price,
+        description: product.description
+      });
 
       res.status(201).json(product);
+      
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server error" });
@@ -110,6 +118,7 @@ class ProductController {
       res.status(500).json({ message: "Server error" });
     }
   }
+  
 }
 
 module.exports = ProductController;
